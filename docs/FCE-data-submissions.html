@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.361">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mack White">
+
+<title>FCE_Acoustic Data Submission_EDI</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="FCE-data-submissions_files/libs/clipboard/clipboard.min.js"></script>
+<script src="FCE-data-submissions_files/libs/quarto-html/quarto.js"></script>
+<script src="FCE-data-submissions_files/libs/quarto-html/popper.min.js"></script>
+<script src="FCE-data-submissions_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="FCE-data-submissions_files/libs/quarto-html/anchor.min.js"></script>
+<link href="FCE-data-submissions_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="FCE-data-submissions_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="FCE-data-submissions_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="FCE-data-submissions_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="FCE-data-submissions_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="FCE-data-submissions_files/libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="FCE-data-submissions_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="FCE-data-submissions_files/libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+<script src="FCE-data-submissions_files/libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="FCE-data-submissions_files/libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+<script src="FCE-data-submissions_files/libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="FCE-data-submissions_files/libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="FCE-data-submissions_files/libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+<script src="FCE-data-submissions_files/libs/leaflet-binding-2.2.0/leaflet.js"></script>
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">FCE_Acoustic Data Submission_EDI</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Mack White </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="generation-of-acoustic-data-submission-for-fce" class="level1">
+<h1>Generation of Acoustic Data Submission for FCE</h1>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(leaflet)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="read-in-csv-output-from-last-round-of-data-submission" class="level2">
+<h2 class="anchored" data-anchor-id="read-in-csv-output-from-last-round-of-data-submission">Read in CSV Output from Last Round of Data Submission</h2>
+<section id="ensure-we-are-formatting-new-data-correctly" class="level3">
+<h3 class="anchored" data-anchor-id="ensure-we-are-formatting-new-data-correctly">Ensure we are formatting new data correctly</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>prior_submission <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../csv outputs/LT_TDCS_Rehage_004_2021.csv"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(prior_submission)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 5,167,429
+Columns: 5
+$ Transmitter  &lt;chr&gt; "A69-1303-32892", "A69-1303-32892", "A69-1303-32892", "A6…
+$ Species      &lt;chr&gt; "Common Snook (Centropomus undecimalis)", "Common Snook (…
+$ Datetime_UTC &lt;dttm&gt; 2015-02-09 20:24:21, 2014-12-01 06:05:12, 2014-06-18 20:…
+$ Latitude     &lt;dbl&gt; 25.45688, 25.42807, 25.45688, 25.45688, 25.45427, 25.4542…
+$ Longitude    &lt;dbl&gt; -80.87605, -80.91492, -80.87605, -80.87605, -80.88065, -8…</code></pre>
+</div>
+</div>
+</section>
+<section id="ultimately-need-five-columns-in-data-submission" class="level3">
+<h3 class="anchored" data-anchor-id="ultimately-need-five-columns-in-data-submission">Ultimately Need Five Columns in Data Submission</h3>
+<section id="transmitter-chr" class="level4">
+<h4 class="anchored" data-anchor-id="transmitter-chr">Transmitter <em><code>(chr)</code></em></h4>
+</section>
+<section id="species-chr" class="level4">
+<h4 class="anchored" data-anchor-id="species-chr">Species <em><code>(chr)</code></em></h4>
+</section>
+<section id="datetime_utc-dttm" class="level4">
+<h4 class="anchored" data-anchor-id="datetime_utc-dttm">Datetime_UTC <em><code>(dttm)</code></em></h4>
+</section>
+<section id="latitude-dbl" class="level4">
+<h4 class="anchored" data-anchor-id="latitude-dbl">Latitude <em><code>(dbl)</code></em></h4>
+</section>
+<section id="longitude-dbl" class="level4">
+<h4 class="anchored" data-anchor-id="longitude-dbl">Longitude <em><code>(dbl)</code></em></h4>
+</section>
+</section>
+</section>
+<section id="read-in-snook-bass-and-redfish-data" class="level2">
+<h2 class="anchored" data-anchor-id="read-in-snook-bass-and-redfish-data">Read in Snook, Bass, and Redfish Data</h2>
+<section id="these-are-por-e.g.-allsnook_periodofrecord_06142023.rds-data-from-most-recent-download-event" class="level3">
+<h3 class="anchored" data-anchor-id="these-are-por-e.g.-allsnook_periodofrecord_06142023.rds-data-from-most-recent-download-event">These are POR (e.g., <em>AllSnook_PeriodOfRecord_06142023.rds</em>) “data from most recent download event</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Snook <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"../data/AllSnook_PeriodOfRecord_06142023.rds"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Bass <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"../data/AllBass_PeriodOfRecord_06142023.rds"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>Redfish <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"../data/AllRedfish_PeriodOfRecord_06142023.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="add-species-name-column-remove-unnecessary-columns-for-each-species" class="level2">
+<h2 class="anchored" data-anchor-id="add-species-name-column-remove-unnecessary-columns-for-each-species">Add Species Name Column &amp; Remove Unnecessary Columns for Each Species</h2>
+<section id="need-species-id-prior-to-join-to-differentiate" class="level3">
+<h3 class="anchored" data-anchor-id="need-species-id-prior-to-join-to-differentiate">Need species id prior to join to differentiate</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Snook <span class="ot">&lt;-</span> Snook <span class="sc">|&gt;</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(Transmitter, Datetime_UTC, Latitude, Longitude) <span class="sc">|&gt;</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Species =</span> <span class="st">"Common Snook (Centropomus undecimalis)"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>Bass <span class="ot">&lt;-</span> Bass <span class="sc">|&gt;</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(Transmitter, Datetime_UTC, Latitude, Longitude) <span class="sc">|&gt;</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Species =</span> <span class="st">"Largemouth Bass (Micropterus salmoides)"</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>Redfish <span class="ot">&lt;-</span> Redfish <span class="sc">|&gt;</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(Transmitter, Datetime_UTC, Latitude, Longitude) <span class="sc">|&gt;</span> </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Species =</span> <span class="st">"Red Drum (Sciaenops ocellatus)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="join-cleaned-data-frames" class="level2">
+<h2 class="anchored" data-anchor-id="join-cleaned-data-frames">Join Cleaned Data Frames</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>SnookBass <span class="ot">&lt;-</span> <span class="fu">full_join</span>(Snook, Bass)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>SnookBassRedfish <span class="ot">&lt;-</span> <span class="fu">full_join</span>(SnookBass, Redfish)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="ensure-columns-are-classified-e.g.-dttm-correctly" class="level2">
+<h2 class="anchored" data-anchor-id="ensure-columns-are-classified-e.g.-dttm-correctly">Ensure Columns are Classified (e.g., <em><code>dttm</code></em>) correctly</h2>
+<section id="fix-if-not" class="level3">
+<h3 class="anchored" data-anchor-id="fix-if-not">Fix if not</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(SnookBassRedfish)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 7,154,425
+Columns: 5
+$ Transmitter  &lt;fct&gt; A69-1303-51309, A69-1303-58417, A69-1303-51325, A69-1303-…
+$ Datetime_UTC &lt;dttm&gt; 2012-04-17 19:22:14, 2012-05-16 23:46:42, 2012-05-02 16:…
+$ Latitude     &lt;dbl&gt; 25.44403, 25.44403, 25.44403, 25.44403, 25.44403, 25.4440…
+$ Longitude    &lt;dbl&gt; -80.96093, -80.96093, -80.96093, -80.96093, -80.96093, -8…
+$ Species      &lt;chr&gt; "Common Snook (Centropomus undecimalis)", "Common Snook (…</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>ForSubmission <span class="ot">&lt;-</span> SnookBassRedfish <span class="sc">|&gt;</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">Transmitter =</span> <span class="fu">as.character</span>(Transmitter))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(ForSubmission)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 7,154,425
+Columns: 5
+$ Transmitter  &lt;chr&gt; "A69-1303-51309", "A69-1303-58417", "A69-1303-51325", "A6…
+$ Datetime_UTC &lt;dttm&gt; 2012-04-17 19:22:14, 2012-05-16 23:46:42, 2012-05-02 16:…
+$ Latitude     &lt;dbl&gt; 25.44403, 25.44403, 25.44403, 25.44403, 25.44403, 25.4440…
+$ Longitude    &lt;dbl&gt; -80.96093, -80.96093, -80.96093, -80.96093, -80.96093, -8…
+$ Species      &lt;chr&gt; "Common Snook (Centropomus undecimalis)", "Common Snook (…</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="if-looks-correct-write-as-csv-and-submit" class="level2">
+<h2 class="anchored" data-anchor-id="if-looks-correct-write-as-csv-and-submit">If looks correct, write as csv and submit</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(ForSubmission, <span class="st">"../csv outputs/LT_TDCS_Rehage_004_2023.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="for-fun-make-a-map" class="level2">
+<h2 class="anchored" data-anchor-id="for-fun-make-a-map">For fun, make a map</h2>
+<section id="below-summarize-data-to-make-easier-to-work-with-for-map-and-summary-table" class="level3">
+<h3 class="anchored" data-anchor-id="below-summarize-data-to-make-easier-to-work-with-for-map-and-summary-table">Below, summarize data to make easier to work with for map and summary table</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>all_summary <span class="ot">&lt;-</span> ForSubmission <span class="sc">|&gt;</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(Latitude,Longitude,Species) <span class="sc">|&gt;</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarize</span>(<span class="at">observations =</span> <span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'Latitude', 'Longitude'. You can override
+using the `.groups` argument.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>station_info <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../data/Station_Distance_Updated07142020.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 83 Columns: 5
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): Station, VUE_Name
+dbl (3): Distance, Latitude, Longitude
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>summary_full <span class="ot">&lt;-</span> <span class="fu">right_join</span>(all_summary, station_info) <span class="sc">|&gt;</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">drop_na</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(Latitude, Longitude)`</code></pre>
+</div>
+</div>
+</section>
+<section id="map-of-all-sites-with-their-names-generated-below" class="level3">
+<h3 class="anchored" data-anchor-id="map-of-all-sites-with-their-names-generated-below">Map of all sites with their names generated below</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">leaflet</span>(summary_full) <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addWMSTiles</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"https://basemap.nationalmap.gov/arcgis/services/USGSImageryTopo/MapServer/WmsServer"</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">layers =</span> <span class="st">"0"</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">options =</span> <span class="fu">WMSTileOptions</span>(<span class="at">format =</span> <span class="st">"image/png"</span>, <span class="at">transparent =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addWMSTiles</span>(</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"https://basemap.nationalmap.gov/arcgis/services/USGSHydroCached/MapServer/WmsServer"</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">layers =</span> <span class="st">"0"</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">options =</span> <span class="fu">WMSTileOptions</span>(<span class="at">format =</span> <span class="st">"image/png"</span>, <span class="at">transparent =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">addCircleMarkers</span>(</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">lng =</span> <span class="sc">~</span> Longitude,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">lat =</span> <span class="sc">~</span> Latitude,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">popup =</span> <span class="sc">~</span> VUE_Name,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">radius =</span> <span class="dv">5</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># set fill properties</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">fillColor =</span> <span class="st">"salmon"</span>,</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">fillOpacity =</span> <span class="dv">1</span>,</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># set stroke properties</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">stroke =</span> T,</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="fl">0.5</span>,</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">opacity =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-40049fc211fec0aaddf9" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-40049fc211fec0aaddf9">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addWMSTiles","args":["https://basemap.nationalmap.gov/arcgis/services/USGSImageryTopo/MapServer/WmsServer",null,null,{"styles":"","format":"image/png","transparent":true,"version":"1.1.1","layers":"0"}]},{"method":"addWMSTiles","args":["https://basemap.nationalmap.gov/arcgis/services/USGSHydroCached/MapServer/WmsServer",null,null,{"styles":"","format":"image/png","transparent":true,"version":"1.1.1","layers":"0"}]},{"method":"addCircleMarkers","args":[[25.3060333,25.3275,25.3311,25.33178,25.3359,25.33633,25.339817,25.34475,25.350817,25.35085,25.35085,25.353183,25.35672,25.36015,25.36015,25.36179,25.36179,25.36996,25.36996,25.37307,25.37307,25.37307,25.37882,25.37882,25.37882,25.37981,25.38374,25.38374,25.386,25.386,25.386,25.39198525,25.39198525,25.39325,25.39325,25.3941333,25.3941333,25.39768,25.40418,25.40418,25.40418,25.40824,25.40824,25.40824,25.41043,25.41043,25.41043,25.41242,25.41242,25.41437,25.41437,25.41437,25.41628,25.41628,25.41628,25.4171167,25.4171167,25.4171167,25.41779,25.41779,25.41779,25.41941,25.41941,25.41941,25.4221,25.4221,25.4221,25.42619,25.42619,25.42619,25.42787,25.42787,25.42787,25.42806,25.42806,25.42806,25.42807,25.42807,25.42887,25.42893,25.42894,25.42894,25.42894,25.42908,25.42908,25.42922,25.42963,25.42963,25.42963,25.4297722,25.42996,25.43039,25.43057,25.43057,25.43057,25.43136,25.43136,25.43136,25.43351,25.43405,25.43405,25.43947,25.43947,25.43947,25.43977,25.43977,25.43977,25.43979,25.43979,25.43979,25.4440333,25.44765,25.44765,25.44765,25.45015,25.45015,25.45015,25.45427,25.45427,25.45427,25.45645,25.45645,25.45688,25.45688,25.45688,25.45985,25.45985,25.46085,25.46085,25.46085,25.46135,25.46135,25.46283,25.46283,25.4633,25.4633],[-80.950667,-81.14136000000001,-81.12051700000001,-81.1302,-81.10894999999999,-81.11548000000001,-81.100433,-81.092883,-81.08305,-81.08302999999999,-81.08302999999999,-81.06665,-81.10671000000001,-81.09813,-81.09813,-81.09211999999999,-81.09211999999999,-81.10149,-81.10149,-81.04224000000001,-81.04224000000001,-81.04224000000001,-81.02934,-81.02934,-81.02934,-81.09738,-81.02088000000001,-81.02088000000001,-81.01546999999999,-81.01546999999999,-81.01546999999999,-80.99678247,-80.99678247,-81.02462,-81.02462,-81.00051670000001,-81.00051670000001,-81.02817,-80.96767,-80.96767,-80.96767,-80.96702999999999,-80.96702999999999,-80.96702999999999,-81.00841,-81.00841,-81.00841,-81.14002000000001,-81.14002000000001,-80.97638999999999,-80.97638999999999,-80.97638999999999,-80.95659000000001,-80.95659000000001,-80.95659000000001,-80.98956699999999,-80.98956699999999,-80.98956699999999,-81.01324,-81.01324,-81.01324,-81.00063,-81.00063,-81.00063,-80.98733,-80.98733,-80.98733,-80.92746,-80.92746,-80.92746,-80.91856,-80.91856,-80.91856,-80.97817000000001,-80.97817000000001,-80.97817000000001,-80.91492,-80.91492,-81.14041,-80.95228,-81.1405,-81.1405,-81.1405,-81.00105000000001,-81.00105000000001,-81.00391,-80.96657,-80.96657,-80.96657,-80.96930829999999,-81.11208000000001,-80.95558,-81.08884,-81.08884,-81.08884,-81.08347000000001,-81.08347000000001,-81.08347000000001,-80.95011,-80.95214,-80.95214,-80.90729,-80.90729,-80.90729,-80.93855000000001,-80.93855000000001,-80.93855000000001,-80.93523999999999,-80.93523999999999,-80.93523999999999,-80.960933,-80.94931,-80.94931,-80.94931,-80.94696999999999,-80.94696999999999,-80.94696999999999,-80.88065,-80.88065,-80.88065,-80.91965,-80.91965,-80.87605000000001,-80.87605000000001,-80.87605000000001,-80.86311000000001,-80.86311000000001,-80.86954,-80.86954,-80.86954,-80.86662,-80.86662,-80.86597999999999,-80.86597999999999,-80.87614000000001,-80.87614000000001],5,null,null,{"interactive":true,"className":"","stroke":true,"color":"white","weight":0.5,"opacity":1,"fill":true,"fillColor":"salmon","fillOpacity":1},null,null,["Whitewater Bay Base NR1","Shark River South SRSLittleShark1","Shark River Base SR6","Shark River South SRSLittleShark2","Shark River Base SR5","SRS6NEW","Shark River Base SR4","Shark River Base SR3","Shark River Base SR2","Shark River South SRS2NEW","Shark River South SRS2NEW","Shark River Base SR1","Shark River South SRS11","Shark River South 51","Shark River South 51","Shark River South 50","Shark River South 50","Shark River South SRS25NEW","Shark River South SRS25NEW","Shark River South Base 01","Shark River South Base 01","Shark River South Base 01","Shark River South Base 02","Shark River South Base 02","Shark River South Base 02","Shark River South SRS12NEW","Shark River South Base SR1A","Shark River South Base SR1A","Shark River South Base SR1B","Shark River South Base SR1B","Shark River South Base SR1B","Derek's Cut Base DC2","Derek's Cut Base DC2","Shark River Middle Base SRM2","Shark River Middle Base SRM2","Derek's Cut Base DC1","Derek's Cut Base DC1","Shark River Middle Base SRM1","Tarpon Bay East Base TBE1","Tarpon Bay East Base TBE1","Tarpon Bay East Base TBE1","Tarpon Bay East Base TBE2","Tarpon Bay East Base TBE2","Tarpon Bay East Base TBE2","Tarpon Bay West Base TBW1","Tarpon Bay West Base TBW1","Tarpon Bay West Base TBW1","Shark River North SRN 13","Shark River North SRN 13","Tarpon Bay Middle Base TBM5","Tarpon Bay Middle Base TBM5","Tarpon Bay Middle Base TBM5","Rookery Branch West Base RBW2","Rookery Branch West Base RBW2","Rookery Branch West Base RBW2","Tarpon Bay Middle Base TBM3","Tarpon Bay Middle Base TBM3","Tarpon Bay Middle Base TBM3","Tarpon Bay West Base TBW3","Tarpon Bay West Base TBW3","Tarpon Bay West Base TBW3","Tarpon Bay Middle Base TBM1A","Tarpon Bay Middle Base TBM1A","Tarpon Bay Middle Base TBM1A","Tarpon Bay Middle Base TBM2","Tarpon Bay Middle Base TBM2","Tarpon Bay Middle Base TBM2","Rookery Branch KC1","Rookery Branch KC1","Rookery Branch KC1","Rookery Branch South Base RBS2","Rookery Branch South Base RBS2","Rookery Branch South Base RBS2","Tarpon Bay North Base TBN3","Tarpon Bay North Base TBN3","Tarpon Bay North Base TBN3","Rookery Branch South Base RBS1","Rookery Branch South Base RBS1","Shark River South SRS12","Tarpon Bay Upper Base TBU2","Shark River North SRN12","Shark River North SRN12","Shark River North SRN12","Tarpon Bay North Base TBN1","Tarpon Bay North Base TBN1","Tarpon Bay North Base TBN2","Tarpon Bay North Base TBN4","Tarpon Bay North Base TBN4","Tarpon Bay North Base TBN4","Tarpon Bay Upper Base TBU3","Harney River Base SRN3","Tarpon Bay Upper Base TBU1","Harney River Base SRN2","Harney River Base SRN2","Harney River Base SRN2","Harney River Base SRN1","Harney River Base SRN1","Harney River Base SRN1","Rookery Branch Lower Base RBL2","Rookery Branch Lower Base RBL1","Rookery Branch Lower Base RBL1","Rookery Branch Central Base RBC2","Rookery Branch Central Base RBC2","Rookery Branch Central Base RBC2","Rookery Branch North Base RBN1","Rookery Branch North Base RBN1","Rookery Branch North Base RBN1","Rookery Branch North Base RBN2","Rookery Branch North Base RBN2","Rookery Branch North Base RBN2","Broad River Base BR1","Rookery Branch Upper Base RBU1","Rookery Branch Upper Base RBU1","Rookery Branch Upper Base RBU1","Rookery Branch Upper Base RBU2","Rookery Branch Upper Base RBU2","Rookery Branch Upper Base RBU2","Rookery Branch East Base RBE1","Rookery Branch East Base RBE1","Rookery Branch East Base RBE1","Otter Creek OT1","Otter Creek OT1","Rookery Branch East Base RBE2","Rookery Branch East Base RBE2","Rookery Branch East Base RBE2","Rookery Branch Headwater Base RBHW4","Rookery Branch Headwater Base RBHW4","Rookery Branch East Base RBE3","Rookery Branch East Base RBE3","Rookery Branch East Base RBE3","Rookery Branch Headwater Base RBHW3","Rookery Branch Headwater Base RBHW3","Rookery Branch Headwater Base RBHW2","Rookery Branch Headwater Base RBHW2","Rookery Branch Headwater Base RBHW1","Rookery Branch Headwater Base RBHW1"],null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[25.3060333,25.4633],"lng":[-81.14136000000001,-80.86311000000001]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

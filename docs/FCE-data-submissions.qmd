@@ -1,0 +1,131 @@
+---
+title: "FCE_Acoustic Data Submission_EDI"
+author: "Mack White"
+format: html
+editor: source
+---
+
+# Generation of Acoustic Data Submission for FCE
+
+## Setup
+```{r}
+#| warning: false
+
+library(readr)
+library(tidyverse)
+library(leaflet)
+library(DT)
+```
+
+## Read in CSV Output from Last Round of Data Submission
+### Ensure we are formatting new data correctly
+```{r}
+#| warning: false
+
+prior_submission <- read_csv("../csv outputs/LT_TDCS_Rehage_004_2021.csv")
+glimpse(prior_submission)
+```
+
+### Ultimately Need Five Columns in Data Submission
+#### Transmitter *`(chr)`*
+#### Species *`(chr)`*
+#### Datetime_UTC *`(dttm)`*
+#### Latitude *`(dbl)`*
+#### Longitude *`(dbl)`*
+
+## Read in Snook, Bass, and Redfish Data
+### These are POR (e.g., *AllSnook_PeriodOfRecord_06142023.rds*) "data from most recent download event
+```{r}
+#| warning: false
+
+Snook <- read_rds("../data/AllSnook_PeriodOfRecord_06142023.rds")
+Bass <- read_rds("../data/AllBass_PeriodOfRecord_06142023.rds")
+Redfish <- read_rds("../data/AllRedfish_PeriodOfRecord_06142023.rds")
+```
+
+## Add Species Name Column & Remove Unnecessary Columns for Each Species
+### Need species id prior to join to differentiate
+```{r}
+#| warning: false
+
+Snook <- Snook |> 
+      select(Transmitter, Datetime_UTC, Latitude, Longitude) |> 
+      mutate(Species = "Common Snook (Centropomus undecimalis)")
+
+Bass <- Bass |> 
+      select(Transmitter, Datetime_UTC, Latitude, Longitude) |> 
+      mutate(Species = "Largemouth Bass (Micropterus salmoides)")
+
+Redfish <- Redfish |> 
+      select(Transmitter, Datetime_UTC, Latitude, Longitude) |> 
+      mutate(Species = "Red Drum (Sciaenops ocellatus)")
+```
+
+## Join Cleaned Data Frames
+```{r}
+#| warning: false
+
+SnookBass <- full_join(Snook, Bass)
+
+SnookBassRedfish <- full_join(SnookBass, Redfish)
+```
+
+## Ensure Columns are Classified (e.g., *`dttm`*) correctly
+### Fix if not
+```{r}
+#| warning: false
+
+glimpse(SnookBassRedfish)
+
+ForSubmission <- SnookBassRedfish |> 
+      mutate(Transmitter = as.character(Transmitter))
+
+glimpse(ForSubmission)
+```
+
+## If looks correct, write as csv and submit
+```{r}
+#| warning: false
+
+write_csv(ForSubmission, "../csv outputs/LT_TDCS_Rehage_004_2023.csv")
+```
+
+## For fun, make a map
+### Below, summarize data to make easier to work with for map and summary table
+```{r}
+all_summary <- ForSubmission |> 
+      group_by(Latitude,Longitude,Species) |> 
+      summarize(observations = n())
+
+station_info <- read_csv("../data/Station_Distance_Updated07142020.csv")
+
+summary_full <- right_join(all_summary, station_info) |> 
+      drop_na()
+```
+
+### Map of all sites with their names generated below
+```{r}
+leaflet(summary_full) %>%
+    addWMSTiles(
+        "https://basemap.nationalmap.gov/arcgis/services/USGSImageryTopo/MapServer/WmsServer",
+        layers = "0",
+        options = WMSTileOptions(format = "image/png", transparent = TRUE)) %>%
+    addWMSTiles(
+        "https://basemap.nationalmap.gov/arcgis/services/USGSHydroCached/MapServer/WmsServer",
+        layers = "0",
+        options = WMSTileOptions(format = "image/png", transparent = TRUE)) %>%
+    addCircleMarkers(
+        lng = ~ Longitude,
+        lat = ~ Latitude,
+        popup = ~ VUE_Name,
+        radius = 5,
+        # set fill properties
+        fillColor = "salmon",
+        fillOpacity = 1,
+        # set stroke properties
+        stroke = T,
+        weight = 0.5,
+        color = "white",
+        opacity = 1)
+```
+
