@@ -16,7 +16,6 @@
 *.tiff
 *.tif
 
-
 # Session Data files
 .RData
 .RDataTmp
