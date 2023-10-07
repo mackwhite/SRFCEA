@@ -90,6 +90,10 @@ glimpse(ForSubmission)
 #| warning: false
 
 write_csv(ForSubmission, "../csv outputs/LT_TDCS_Rehage_004_2023.csv")
+
+check <- read_csv("../csv outputs/LT_TDCS_Rehage_004_2023.csv")
+glimpse(check)
+range(check$Datetime_UTC)
 ```
 
 ## For fun, make a map
@@ -130,4 +134,3 @@ leaflet(summary_full) %>%
         color = "white",
         opacity = 1)
 ```
-
