@@ -78,7 +78,9 @@ SnookBassRedfish <- full_join(SnookBass, Redfish)
 glimpse(SnookBassRedfish)
 
 ForSubmission <- SnookBassRedfish |> 
-      mutate(Transmitter = as.character(Transmitter))
+      mutate(Transmitter = as.character(Transmitter)) |> 
+      relocate(Species, .after = Transmitter)
+      
 
 glimpse(ForSubmission)
 ```
