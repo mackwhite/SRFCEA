@@ -6,3 +6,114 @@ editor: source
 ---
 
 # Generation of *MAP* Data Submission for FCE
+
+## Setup
+```{r}
+#| warning: false
+
+library(readr)
+library(tidyverse)
+library(leaflet)
+library(DT)
+library(janitor)
+library(stringr)
+```
+
+```{r}
+#| warning: false
+
+prior_submission <- read_csv("../csv outputs/LT_TDCS_Rehage_001_2021.csv")
+glimpse(prior_submission)
+```
+
+### Current Columns in Data Set
+#### ID *`(chr)`*
+#### Year *`(dbl)`*
+#### Date *`(date)`*
+#### SEASON *`(chr)`*
+#### River *`(chr)`*
+#### Creek *`(dbl)`*
+#### SITETYPE *`(chr)`*
+#### BOUT *`(dbl)`*
+#### A ton of species-level codes that are not very straightforward *`(dbl)`*
+#### CPUE *`(dbl)`*
+#### Distance *`(dbl)`*
+#### CPUE100m *`(dbl)`*
+#### DEPTH_Creek *`(dbl)`*
+#### TEMP *`(dbl)`*
+#### DO *`(dbl)`*
+#### Salinity *`(dbl)`*
+#### SH1DSLD *`(dbl)`*
+#### SH1AVE15D *`(dbl)`*
+#### UPDISTANCE *`(dbl)`*
+#### MEANDIST *`(dbl)`*
+
+#### The current data looks janky, column names are not very informative, overall dataset is not very *F.A.I.R*
+#### Going to fix that this year (November 2023)
+
+## Read in up-to-date MAP data, set up columns, and select what we need
+```{r}
+raw_dat <- read_csv("../data/MAP_yrs1thru19.csv")
+glimpse(raw_dat)
+
+dat <- raw_dat |> 
+  mutate(ID = as.character(paste(Year, SEASON, DRAINAGE, SITE, BOUT, sep = "")),
+         DATE = as.Date(paste(s.yr, s.mo, s.day,sep = "-")),
+         Hydrologic_Year = as.character(HYDROYEAR),
+         River = as.character(DRAINAGE),
+         common_name = (str_replace(common_name, fixed(" "), "_")),
+         Creek = as.factor(SITE)) |> 
+      select(ID, Year, DATE, SEASON, River, Creek, BOUT, common_name, CATCHNUMBER, Distance, TRIPDEPTH, DOMGL, SALINITY, TempC)
+
+glimpse(dat)
+```
+
+## Clean up the column names
+```{r}
+dat_clean <- dat |> 
+      clean_names(case = "upper_camel", abbreviations = c("ID", "DOMGL"))
+
+dat_sum <- dat_clean |> 
+      group_by(ID, CommonName) |> 
+      mutate(CatchSum = sum(Catchnumber)) |> 
+      ungroup() |> 
+      group_by(ID) |> 
+      mutate(Catch = sum(Catchnumber),
+             CPUE = (Catch/Distance)*100) |> 
+      distinct()
+
+glimpse(dat_sum)
+```
+
+## Convert from long to wide format
+```{r}
+
+dat_wide <- dat_sum |> 
+      pivot_wider(
+            names_from = CommonName,
+            values_from = CatchSum,
+            values_fill = 0
+      )
+
+glimpse(dat_wide)
+
+# dat_wide <- dat_wide |> 
+#       mutate(Creek = as.character(Creek),
+#              Distance = as.numeric(Distance))
+
+dat_wide <- dat_wide |>
+      mutate(Creek = as.character(Creek),
+             Distance = as.numeric(Distance)) |>
+      select(ID, Year, Date, Season, River, Creek, Bout, Distance, DOMGL, Salinity, TempC, Marsh_killifish, Golden_topminnow, Golden_shiner, Chain_pickerel, Florida_gar, Grass_pickerel, Sunfishes, Largemouth_bass, Lake_chubsucker, Seminole_killifish, Hogchoker, Tadpole_madtom, Warmouth, Bluegill, Redear, Spotted_sunfish, Dollar_sunfish, Bluespotted_sunfish, Snook, Tarpon, Striped_mullet, Gray_snapper, American_eel, Mayan_cichlid, Redfish, Coastal_shiner, Blue_tilapia, Mosquitofish, Tidewater_mojarra, Inland_silverside, Jack_Crevalle, Crested_goby, Peacock_eel, Sheepshead_minnow, Rainwater_killifish, Pike_killifish, Bluefin_killifish, Golden_shiner, Golden_topminnow, Brook_silverside, Jewel_Cichlid, Pinfish, Ladyfish, Peacock_bass, Atlantic_needlefish, Gulf_killifish, Tidewater_silverside, Spotted_seatrout, Diamond_killifish, Gafftopsail_catfish, Brown_Hoplo, Mozambique_tilapia, Timucu, Code_goby, Yellow_bullhead, Hardhead_catfish, Brown_bullhead, Bay_anchovy, Taillight_shiner, Barracuda, Oscar, Pirate_perch, Snakehead, Redfin_pickerel, Banded_Topminnow, Catch, CPUE)
+
+glimpse(dat_wide)
+
+```
+
+```{r}
+write_csv(dat_wide, "../csv outputs/LT_TDCS_Rehage_001_2023.csv")
+
+check <- read_csv("../csv outputs/LT_TDCS_Rehage_001_2023.csv")
+glimpse(check)
+```
+
