@@ -117,3 +117,47 @@ check <- read_csv("../csv outputs/LT_TDCS_Rehage_001_2023.csv")
 glimpse(check)
 ```
 
+## made several post-hoc revisions that need to be incorporated into the work flow (see below for more detail)
+
+### Hi Mack,
+
+ 
+
+The data and metadata you submitted for LT_TDCS_Rehage_001 look great overall, and there are a few minor things that need to be taken care of.
+
+ 
+
+The Catch and CPUE columns are listed in the metadata as coming before the fish count data, but they appear in the data file as the last columns. Can you please either update the metadata or data file so the order matches?
+
+ 
+
+Some columns in the data file include “NA” values, but missing value codes are listed for those columns as -9999 in the DataTable metadata (or not at all in the case of Date and Creek columns). Can you please verify those NA  values are missing data and then replace them with -9999 values in numeric columns? Date and Creek columns also need to have missing value codes added and defined in the metadata. For reference, we usually use “NA” for missing values in text columns and -9999 in numeric columns nowadays. For the Date column, it might be easiest to keep “NA” for the missing value code and add it in the metadata along with a definition below it.
+
+ 
+
+Data file columns with “NA” values
+
+Date
+Creek
+Bout
+Distance
+DOMGL
+Catch
+CPUE
+ 
+
+The DOMGL column contains non-numeric “DNT” values. They should be replaced with numeric values or with missing value codes. If they need to be flagged for some reason, I would add a flag or comment column.
+
+ 
+
+In case it’s helpful, I’ve attached a zipped RStudio project with example R code for how I would potentially handle the NA values in numeric columns (see line 99 of R script) if I was processing them on my end using tidyverse packages. Also, all values in columns should have a number of decimal places consistent with the column precision in the metadata. This is something I can handle on my end before publishing the data, but I’ve included an example of how to do that in the code (lines 100-105) in case you would like to do that on your end.
+
+ 
+
+Thanks, and please let me know if you have any questions!
+
+ 
+
+Cheers,
+
+Gabe
