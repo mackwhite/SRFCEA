@@ -1,18 +1,17 @@
-# Startup and information -------------------------------------------------
-# SharkRiverMovementCode_AppendDownloadCycle_"Month(s)Year".R
-# Date Last Updated: 10/18/2023
-# Author: J. Massie - Modified by Mack White Summer 2023
-# Purpose: Script takes raw VUE movement data from database offload and merges with a table to add distance from river mouth (station distances in river km), screens for Rehage Lab tags, filters detections by species, and plots timerseries of movement tracks
+###project: SRFCEA
+###author(s): Mack White
+###goal(s): append new detections to period of record file
+###date(s): April 2024
+###note(s): stations misproperly assigned in November corrected in script titled
+# "station reassignment_sprin2024.R"
 
-# turn on softwrap longlines
-# turn on rainbow parantheses
+###########################################################################
+# Housekeeping ------------------------------------------------------------
+###########################################################################
 
-# Read in packages from library and setwd ()-------------------------------
-library(tidyverse)
-library(scales)
-library(ggplot2)
-
-setwd("/Users/mack/Dropbox/Research/field work/Acoustic Telemetry/Sampling Events/Nov2023_DL")
+### load necessary libraries
+### install.packages("librarian")
+librarian::shelf(tidyverse, scales, ggplot2)
 
 # define custom save_rds function -----------------------------------------
 
@@ -23,7 +22,7 @@ save_rds <- function(data, filename) {
 
 # read in vue offload from previous download ------------------------------
 
-NewestVUE <- read.csv("NovDec_2023_VUEoffload.csv")
+NewestVUE <- read_csv("database management/2024_Spring/Spring2024_VUEoffload_STATIONSFIXED.csv")
 glimpse(NewestVUE)
 
 # manipulate data to match format of previous all vue rds file ------------
@@ -42,7 +41,7 @@ glimpse(NewestVUE2)
 
 # read in "old" All VUE file generated during previous append -------------
 
-OldVUE <- readRDS("FinalVUE_wDatetime_10182023_ALL.rds")
+OldVUE <- readRDS("database management/2024_Spring/FinalVUE_wDatetime_01312024_ALL.rds")
 glimpse(OldVUE)
 
 # make sure everything matches up for rbind -------------------------------
@@ -55,9 +54,9 @@ AllVUE <- rbind(OldVUE, NewestVUE2)
 AllVUE$Datetime_UTC <- as.POSIXct(AllVUE$Datetime_UTC, 
                                   format="%Y-%m-%d %H:%M:%S", tz = "UTC")
 glimpse(AllVUE)
-# saveRDS(AllVUE, "RDS_files/FinalVUE_wDatetime_01312024_ALL.rds") #becomes OldVUE on next append
+# saveRDS(AllVUE, "database management/2024_Spring/RDS_files/FinalVUE_wDatetime_04222024_ALL.rds") #becomes OldVUE on next append
 rm(list = ls()) #clear env to save memory
-FinalVUE <- readRDS("RDS_files/FinalVUE_wDatetime_01312024_ALL.rds")
+FinalVUE <- readRDS("database management/2024_Spring/RDS_files/FinalVUE_wDatetime_04222024_ALL.rds")
 
 vue_check <- FinalVUE |> 
       mutate(
@@ -69,9 +68,9 @@ vue_check <- FinalVUE |>
 vue_check <- as.data.frame(unique(vue_check$YearMonth))
 
 # read in tag list and station data ---------------------------------------
-TagList <- read.csv("Acoustic Tags Master List_06132023update.csv") |> 
+TagList <- read_csv("database management/2024_Spring/Acoustic Tags Master List_04222024update.csv") |> 
       mutate(Transmitter = as.factor(Transmitter))
-StationData <- read.csv("Station_Distance_Updated07142020.csv") |> 
+StationData <- read_csv("database management/2024_Spring/Station_Distance_Updated07142020.csv") |> 
       mutate(Station.Name = as.factor(VUE_Name))
 
 # join station, tag, and detection data -----------------------------------
@@ -81,22 +80,23 @@ RawVUE <- FinalVUE |>
 RehageVUE <- left_join(RawVUE, TagList, by = "Transmitter")
 RehageVUE_Distance <- left_join(RehageVUE, StationData, by = "Station.Name")
 
-# saveRDS(RehageVUE_Distance, "RDS_files/RehageVUE_Distance_01312024.rds")
+### keeps all detections on record, but could sort for our tags/make assumptions about identity of others (cough cough bull sharks) if wanted for some other analyses 
+saveRDS(RehageVUE_Distance, "database management/2024_Spring/RDS_files/RehageVUE_All_04222024.rds")
 
 # generate period of record files for species -----------------------------
 
 RehageVUE_Distance |> 
       filter(Species == "Snook") |> 
-      save_rds("RDS_files/AllSnook_POR_01312024.rds")
+      save_rds("database management/2024_Spring/RDS_files/AllSnook_POR_04222024.rds")
 
 RehageVUE_Distance |> 
       filter(Species == "Bass") |> 
-      save_rds("RDS_files/AllBass_POR_01312024.rds")
+      save_rds("database management/2024_Spring/RDS_files/AllBass_POR_04222024.rds")
 
 RehageVUE_Distance |> 
       filter(Species == "Redfish") |> 
-      save_rds("RDS_files/AllRedfish_POR_01312024.rds")
+      save_rds("database management/2024_Spring/RDS_files/AllRedfish_POR_04222024.rds")
 
 RehageVUE_Distance |> 
       filter(Species == "Tarpon") |> 
-      save_rds("RDS_files/AllTarpon_POR_01312024.rds")
+      save_rds("database management/2024_Spring/RDS_files/AllTarpon_POR_04222024.rds")
