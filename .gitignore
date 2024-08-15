@@ -5,6 +5,9 @@
 # CSV Files
 *.csv
 
+# PDF Files
+*.pdf
+
 # Excel Files
 *.xlsx
 *.xls
