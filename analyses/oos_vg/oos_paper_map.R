@@ -65,7 +65,7 @@ ggmap(florida_map) +
             legend.text = element_text(face = "bold"), size = 12)
 
 ### save for publication
-ggsave("analyses/oos_vg/drafted_map.tiff", units = "in", width = 12,
-       height = 6, dpi =  600, compression = "lzw")
+# ggsave("analyses/oos_vg/drafted_map.tiff", units = "in", width = 12,
+#        height = 6, dpi =  600, compression = "lzw")
 
       
