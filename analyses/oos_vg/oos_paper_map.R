@@ -32,6 +32,7 @@ array_coords <- dat |>
                 longitude = mean(longitude))
 
 florida_map <- get_stadiamap(
+      ### determine bounding box: https://www.openstreetmap.org/#map=5/25.304/-69.412
       bbox = c(left = -81.85, bottom = 25.0, right = -80.0, top = 26.0),
       maptype = 'stamen_terrain',
       zoom = 10
