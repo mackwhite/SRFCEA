@@ -33,11 +33,14 @@ array_coords <- dat |>
 
 joins <- data.frame(
       array = c("CELA", "Kroetz", "NOSAWR", "OTN.BTTFLK", "Rookery Bay", "SRFCEA"),
-      new = c("CELA", "NOAAA", "NOSAWRA", "BTTA", "RBNERRA", "SRFCEA")
+      new = c("CELA", "NOSAWRA", "NOSAWRA", "BTTA", "RBNERRA", "SRFCEA")
 )
 
 plot_dt <- dat |> 
-      left_join(joins, by = "array")
+      left_join(joins, by = "array") |> 
+      mutate(new = case_when(new == 'NOSAWRA' &  latitude > 25.6 ~ 'NOSAWRA-N',
+                             new == 'NOSAWRA' &  latitude < 25.6 ~ 'NOSAWRA-S',
+                             TRUE ~ new))
 
 florida_map2 <- get_map(
       ### determine bounding box: https://www.openstreetmap.org/#map=5/25.304/-69.412
