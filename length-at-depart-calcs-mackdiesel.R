@@ -48,18 +48,4 @@ gas <- df_dttm |>
              length_at_dept_sl_cm = length_at_dept_sl_mm/10) |> 
       select(-sl_mm, -fl_mm, -age_days, -id, -length_at_dept_sl_mm, -length_at_dept_fl_mm)
       
-write_csv(gas, "data/thatgas.csv")
-
-
-
-
-
-
-gas <- df_dttm |> 
-      mutate(DateTagged = mdy(DateTagged),
-             dept = as_datetime(dept),
-             time_diff_years = as.numeric(difftime(dept, DateTagged, units = "days")) / 365.25) |> 
-      mutate(predict_length = 947.3 * (1 - exp(-0.175 * (time_diff_years + 1.352))))
-
-
-
+# write_csv(gas, "data/thatgas.csv")
