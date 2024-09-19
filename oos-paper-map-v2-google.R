@@ -8,8 +8,8 @@
 ### install necessary packages ---
 librarian::shelf(tidyverse, readr, janitor, zoo, 
                  lubridate, openintro, maps, ggmap,
-                 ggthemes, shapefiles, broom, sf, ggspatial, maptools, 
-                 ggsn, GISTools)
+                 ggthemes, shapefiles, broom, sf, ggspatial, 
+                 GISTools)
 
 ### set theme ---
 theme_set(theme_minimal())
@@ -33,14 +33,26 @@ array_coords <- dat |>
 
 joins <- data.frame(
       array = c("CELA", "Kroetz", "NOSAWR", "OTN.BTTFLK", "Rookery Bay", "SRFCEA"),
-      new = c("CELA", "NOSAWRA", "NOSAWRA", "BTTA", "RBNERRA", "SRFCEA")
+      new = c("CELA", "NOSAWRA", "NOSAWRA", "BTT", "RBNERRA", "SRFCEA")
+)
+
+btt_wreck <- data.frame(
+      station_name = "btt_wreck",
+      latitude = 25.6689,
+      longitude = -81.4278,
+      array = "BTT_wreck",
+      new = "BTTA"
 )
 
 plot_dt <- dat |> 
       left_join(joins, by = "array") |> 
-      mutate(new = case_when(new == 'NOSAWRA' &  latitude > 25.6 ~ 'NOSAWRA-N',
+      rbind(btt_wreck) |> 
+      mutate(new = case_when(new == 'NOSAWRA' &  latitude >= 25.6 ~ 'NOSAWRA-N',
                              new == 'NOSAWRA' &  latitude < 25.6 ~ 'NOSAWRA-S',
+                             new == 'BTTA' & latitude >= 25.6 ~ 'BTT-N',
+                             new == 'BTTA' & latitude < 25.6 ~ 'BTT-S',
                              TRUE ~ new))
+      
 
 florida_map2 <- get_map(
       ### determine bounding box: https://www.openstreetmap.org/#map=5/25.304/-69.412
@@ -87,5 +99,5 @@ ggmap(florida_map2) +
             legend.position = c(0.001, 0.275))
 
 ### save for publication
-ggsave("mapping/test_map.tiff", units = "in", width = 12,
-       height = 6, dpi =  600, compression = "lzw")
+# ggsave("mapping/test_map.tiff", units = "in", width = 12,
+#        height = 6, dpi =  600, compression = "lzw")
