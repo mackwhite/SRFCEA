@@ -96,13 +96,8 @@ pprob_srtime <- ggeffect(mod, terms = "time_in_SR")
 pprob_year |> 
       ggplot(aes(x = x, y = predicted, fill = response.level)) +
       geom_bar(stat = "identity", position = 'dodge') +
-      # facet_wrap(~response.level, ncol = 1) +
-      # facet_wrap(~response.level) +
-      # geom_line(linewidth = 2) +
-      # geom_smooth(method = "loess", se = TRUE, linewidth = 2, span = 0.4)+
       scale_y_continuous(limits = c(0.0, 1.0), 
                          breaks = seq(0.0, 1.0, by = 0.2)) +
-      # scale_y_continuous(breaks = seq(0.28, 0.38, by = 0.05)) +
       scale_x_continuous(breaks = seq(2012, 2023, by = 2)) +
       scale_color_brewer(palette = "Dark2",
                          name = "",
@@ -129,7 +124,6 @@ pprob_year |>
       geom_smooth(method = "loess", se = TRUE, linewidth = 2, span = 0.4)+
       scale_y_continuous(limits = c(0.0, 1.0), 
                          breaks = seq(0.0, 1.0, by = 0.2)) +
-      # scale_y_continuous(breaks = seq(0.28, 0.38, by = 0.05)) +
       scale_x_continuous(breaks = seq(2012, 2023, by = 2)) +
       scale_color_brewer(palette = "Dark2",
                          name = "",
@@ -158,8 +152,6 @@ pprob_depart |>
       geom_errorbar(aes(ymin = conf.low, ymax = conf.high), size = 2, width = 0) +
       scale_y_continuous(limits = c(0.0, 1.0), 
                          breaks = seq(0.0, 1.0, by = 0.2)) +
-      # scale_y_continuous(breaks = seq(0.28, 0.38, by = 0.05)) +
-      # scale_x_continuous(breaks = seq(2012, 2023, by = 2)) +
       scale_color_brewer(palette = "Dark2",
                          name = "",
                          labels = c("Estuarine Returner",
@@ -187,8 +179,6 @@ pprob_return |>
       geom_errorbar(aes(ymin = conf.low, ymax = conf.high), size = 2, width = 0) +
       scale_y_continuous(limits = c(0.0, 1.0), 
                          breaks = seq(0.0, 1.0, by = 0.2)) +
-      # scale_y_continuous(breaks = seq(0.28, 0.38, by = 0.05)) +
-      # scale_x_continuous(breaks = seq(2012, 2023, by = 2)) +
       scale_color_brewer(palette = "Dark2",
                          name = "",
                          labels = c("Estuarine Returner",
@@ -214,7 +204,6 @@ pprob_srtime |>
       geom_smooth(method = "loess", se = TRUE, linewidth = 2, span = 0.4)+
       scale_y_continuous(limits = c(0.0, 1.0), 
                          breaks = seq(0.0, 1.0, by = 0.2)) +
-      # scale_y_continuous(breaks = seq(0.28, 0.38, by = 0.05)) +
       scale_color_brewer(palette = "Dark2",
                          name = "",
                          labels = c("Estuarine Returner",
