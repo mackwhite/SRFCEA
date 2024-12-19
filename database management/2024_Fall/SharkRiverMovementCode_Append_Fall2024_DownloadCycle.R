@@ -1,9 +1,14 @@
 ###project: SRFCEA
 ###author(s): Mack White
 ###goal(s): append new detections to period of record file
-###date(s): April 2024
-###note(s): stations misproperly assigned in November corrected in script titled
-# "station reassignment_sprin2024.R"
+###date(s): December 2024
+###note(s):
+### had some major issues with VR2TXs this download cycle - many dead on arrival to download
+### some notes on receivers that could be important later
+### Heithaus receivers with issues
+# 484353tx, 484367tx, 484388tx, 137849w
+### Rehage receivers with issues
+# 484391tx, 484357tx
 
 ###########################################################################
 # Housekeeping ------------------------------------------------------------
