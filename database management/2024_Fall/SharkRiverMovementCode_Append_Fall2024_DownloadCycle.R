@@ -29,6 +29,8 @@ save_rds <- function(data, filename) {
 
 NewestVUE <- read_csv("database management/2024_Fall/Fall2024_VUEoffload.csv")
 glimpse(NewestVUE)
+NewestVUE_stations <- NewestVUE |> select(`Station Name`) |> distinct()
+NewestVUE_receivers <- NewestVUE |> select(Receiver) |> distinct()
 
 # manipulate data to match format of previous all vue rds file ------------
 NewestVUE1 <- NewestVUE |> 
@@ -78,8 +80,12 @@ glimpse(AllVUE)
 # saveRDS(AllVUE, "database management/2024_Fall/RDS_files/FinalVUE_wDatetime_12192024_ALL.rds")
 
 rm(list = ls()) #clear env to save memory
+
 FinalVUE <- readRDS("database management/2024_Fall/RDS_files/FinalVUE_wDatetime_12192024_ALL.rds")
 unique(FinalVUE$Station.Name)
+FinalVUE_stations <- FinalVUE |> select(Station.Name) |> distinct()
+FinalVUE_stations <- FinalVUE |> select(Receiver) |> distinct()
+
 FinalVUE2 <- readRDS("database management/2024_Spring/RDS_files/FinalVUE_wDatetime_04222024_ALL.rds")
 unique(FinalVUE2$Station.Name)
 vue_check <- FinalVUE |> 
