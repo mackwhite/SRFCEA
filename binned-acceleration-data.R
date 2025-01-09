@@ -15,11 +15,11 @@ dat <- readRDS("database management/2024_Fall/RDS_files/RehageVUE_All_12192024.r
 glimpse(dat)
 unique(dat$Transmitter)
 
-acc <- read_csv("data/accelerometer-tags.csv") |> 
+tags <- read_csv("data/accelerometer-tags.csv") |> 
       rename(Transmitter = transmitter) |> 
       mutate(tag = 'accelerometer')
 
-all <- left_join(dat, acc, by = "Transmitter")
+all <- left_join(dat, tags, by = "Transmitter")
 acc_fish <- all |> filter(tag == "accelerometer")
 unique(acc_fish$Transmitter)
 
@@ -50,9 +50,19 @@ acc |>
       ggplot(aes(x = as.factor(id), y = acceleration, colour = species)) +
       geom_boxplot()
 
+# binning data ------------------------------------------------------------
+
+acc_binned <- acc |> 
+      mutate(hour_block = floor_date(datetime, unit = "hour")) |> 
+      group_by(id, hour_block) |>                                     
+      summarize(mean_acceleration = mean(acceleration, na.rm = TRUE),
+                mean_distance = mean(distance, na.rm = TRUE),
+                .groups = "drop") |> 
+      rename(datetime = hour_block)
+
 ### split up datetime information
 
-acc_time <- acc |> 
+acc_time <- acc_binned |> 
       mutate(datetime_eastern = with_tz(datetime, tzone = "America/New_York"),
              date = as.Date(datetime_eastern),
              year = year(datetime_eastern),
@@ -166,10 +176,26 @@ keep <- c("acc")
 rm(list = setdiff(ls(), keep))
 glimpse(acc)
 
-### save data for future use
-write_rds(acc, 'data/accelerometer-model-data-012025.RDS')
+tags <- read_csv("data/accelerometer-tags.csv") |> 
+      rename(Transmitter = transmitter,
+             date_tagged = date) |> 
+      select(id, species, tl, sl, weight, date_tagged)
 
-# Kadar, Julianna, Monique Ladds, Johann Mourier, Joanna Day, and Culum Brown. 2019. “Acoustic Accelerometry Reveals Diel Activity Patterns in Premigratory Port Jackson Sharks.” Ecology and Evolution 9 (16): 8933–44.
-# Lennox, Robert J., Sindre H. Eldøy, Lotte S. Dahlmo, Jordan K. Matley, and Knut Wiik Vollset. 2023. “Acoustic Accelerometer Transmitters and Their Growing Relevance to Aquatic Science.” Movement Ecology 11 (1): 45.
-# Meese, Emily N., and Christopher G. Lowe. 2020. “Active Acoustic Telemetry Tracking and Tri-Axial Accelerometers Reveal Fine-Scale Movement Strategies of a Non-Obligate Ram Ventilator.” Movement Ecology 8 (1): 8.
-# Hertel, Anne G., Petri T. Niemelä, Niels J. Dingemanse, and Thomas Mueller. 2020. “A Guide for Studying Among-Individual Behavioral Variation from Movement Data in the Wild.” Movement Ecology 8 (1): 30.
+### join with individual information ---
+all <- acc |> left_join(tags, by = "id")
+
+### clean environment ---
+keep <- c("all")
+rm(list = setdiff(ls(), keep))
+glimpse(all)
+na_count_per_column <- sapply(all, function(x) sum(is.na(x)))
+
+all1 <- all |> 
+      group_by(id, date) |> 
+      mutate(sd_acceleration = sd(mean_acceleration))
+
+na_count_per_column <- sapply(all1, function(x) sum(is.na(x)))
+print(na_count_per_column)
+
+### save data for future use
+write_rds(all1, 'data/binned-accelerometer-model-data-012025.RDS')
