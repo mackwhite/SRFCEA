@@ -23,8 +23,14 @@ glimpse(acc_bin)
 
 ### selected data for models---
 mod_df <- acc_bin |> 
+      rename(temp = temp_c,
+             stage = marsh_stage, 
+             temp_mean = mean_temp_c,
+             temp_sd = sd_temp_c, 
+             temp_min = min_temp_c, 
+             temp_max = max_temp_c) |> 
       select(year, month, day, time, species, id, tl, mean_acceleration, sd_acceleration, 
-             mean_distance, temp, marsh_stage, salinity) |> 
+             mean_distance, temp, temp_mean, temp_sd, temp_min, temp_max, stage, salinity) |> 
       rename(act = mean_acceleration,
              act_sd = sd_acceleration) |> 
       filter(act >= 1) |> 
@@ -44,7 +50,6 @@ rm(list = setdiff(ls(), keep))
 # temperature and hydrology effects on snook activity ---------------------------
 
 snook_df <- mod_df |> 
-      rename(stage = marsh_stage) |> 
       filter(species == "common snook")
 
 ### null model---
@@ -95,11 +100,9 @@ temp_visfit |>
       geom_ribbon(aes(ymin = fit_lower, ymax = fit_upper), fill = "grey60", alpha = 0.3)+
       geom_line(linewidth = 2, color= "black") + theme_bw()+
       labs(x = "Water Temperature (°C)", y = expression(bold("Mean Acceleration (m/s"^2*")"))) +
-      # # scale_x_continuous(breaks = c(0, 5, 10, 15, 20, 25, 30)) +
-      # ### x axis goes to 80, but constricted to 30 cm in above line of code
-      # ### this is reason for wonky figure with shrunken x axis
-      # scale_x_continuous(breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80)) +
-      # ylim(0.3,0.8)+
+      scale_x_continuous(breaks = c(16, 19, 22, 25, 28, 31, 34)) +
+      scale_y_continuous(breaks = c(20, 22, 24, 26, 28, 30)) +
+      geom_vline(xintercept = 26.472, linetype = "dashed", color = "black", size = 1) +
       theme(axis.text = element_text(size = 14, face = "bold", colour = "black"),
             axis.title = element_text(size = 16, face = "bold", colour = "black"),
             plot.title = element_text(size = 16, face = "bold", colour = "black"),
@@ -124,11 +127,8 @@ stage_visfit |>
       geom_ribbon(aes(ymin = fit_lower, ymax = fit_upper), fill = "grey60", alpha = 0.3)+
       geom_line(linewidth = 2, color= "black") + theme_bw()+
       labs(x = "Marsh Stage (cm)", y = expression(bold("Mean Acceleration (m/s"^2*")"))) +
-      # # scale_x_continuous(breaks = c(0, 5, 10, 15, 20, 25, 30)) +
-      # ### x axis goes to 80, but constricted to 30 cm in above line of code
-      # ### this is reason for wonky figure with shrunken x axis
-      # scale_x_continuous(breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80)) +
-      # ylim(0.3,0.8)+
+      # scale_x_continuous(breaks = c(16, 19, 22, 25, 28, 31, 34)) +
+      scale_y_continuous(breaks = c(24, 27, 30, 33, 36)) +
       theme(axis.text = element_text(size = 14, face = "bold", colour = "black"),
             axis.title = element_text(size = 16, face = "bold", colour = "black"),
             plot.title = element_text(size = 16, face = "bold", colour = "black"),
@@ -141,7 +141,6 @@ stage_visfit |>
 # temperature and hydrology effects on bass activity ---------------------------
 
 bass_df <- mod_df |> 
-      rename(stage = marsh_stage) |> 
       filter(species == "largemouth bass")
 
 ### null model---
@@ -192,11 +191,8 @@ temp_visfit |>
       geom_ribbon(aes(ymin = fit_lower, ymax = fit_upper), fill = "grey60", alpha = 0.3)+
       geom_line(linewidth = 2, color= "black") + theme_bw()+
       labs(x = "Water Temperature (°C)", y = expression(bold("Mean Acceleration (m/s"^2*")"))) +
-      # # scale_x_continuous(breaks = c(0, 5, 10, 15, 20, 25, 30)) +
-      # ### x axis goes to 80, but constricted to 30 cm in above line of code
-      # ### this is reason for wonky figure with shrunken x axis
-      # scale_x_continuous(breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80)) +
-      # ylim(0.3,0.8)+
+      scale_x_continuous(breaks = c(16, 19, 22, 25, 28, 31, 34)) +
+      geom_vline(xintercept = 27.464, linetype = "dashed", color = "black", size = 1) +
       theme(axis.text = element_text(size = 14, face = "bold", colour = "black"),
             axis.title = element_text(size = 16, face = "bold", colour = "black"),
             plot.title = element_text(size = 16, face = "bold", colour = "black"),

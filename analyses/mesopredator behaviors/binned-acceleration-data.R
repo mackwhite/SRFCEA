@@ -50,13 +50,16 @@ acc |>
       ggplot(aes(x = as.factor(id), y = acceleration, colour = species)) +
       geom_boxplot()
 
+acc1 <- acc |> filter(distance >= 22.0)
+
 # binning data ------------------------------------------------------------
 
-acc_binned <- acc |> 
+acc_binned <- acc1 |> 
       mutate(hour_block = floor_date(datetime, unit = "hour")) |> 
       group_by(id, hour_block) |>                                     
       summarize(mean_acceleration = mean(acceleration, na.rm = TRUE),
                 mean_distance = mean(distance, na.rm = TRUE),
+                sd_acceleration = sd(acceleration, na.rm = TRUE),
                 .groups = "drop") |> 
       rename(datetime = hour_block)
 
@@ -129,7 +132,11 @@ temp <- bc_temperature |>
 glimpse(temp)
 summary(temp)
 
-acc_time_sun_clean_temp <- left_join(acc_time_sun_clean, temp, by = 'date')
+temp_hr <- read_csv("analyses/mesopredator behaviors/local-data/botcreek_temp_15mins.csv")
+temphr1 <- temp_hr |> 
+      mutate(datetime_est = as.POSIXct(datetime, format = "%m/%d/%y %H:%M"))
+
+acc_time_sun_clean_temp <- left_join(acc_time_sun_clean, temphr1, by = 'datetime_est')
 na_count_per_column <- sapply(acc_time_sun_clean_temp, function(x) sum(is.na(x)))
 print(na_count_per_column)
 
@@ -137,6 +144,8 @@ print(na_count_per_column)
 acc <- acc_time_sun_clean_temp
 keep <- c("acc")
 rm(list = setdiff(ls(), keep))
+
+acc <- acc |> select(-datetime)
 
 ### add marsh stage data
 
@@ -192,10 +201,38 @@ na_count_per_column <- sapply(all, function(x) sum(is.na(x)))
 
 all1 <- all |> 
       group_by(id, date) |> 
-      mutate(sd_acceleration = sd(mean_acceleration))
+      mutate(daily_sd_acceleration = sd(mean_acceleration)) |> 
+      group_by(date) |> 
+      mutate(mean_temp_c = mean(temp_c),
+             min_temp_c = min(temp_c),
+             max_temp_c = max(temp_c),
+             sd_temp_c = sd(temp_c)) |> 
+      ungroup() |> 
+      filter(!is.na(temp_c))
 
 na_count_per_column <- sapply(all1, function(x) sum(is.na(x)))
 print(na_count_per_column)
+
+glimpse(all1)
+
+all2 <- all |> 
+      mutate(
+            sunrise = as.POSIXct(paste(date, sunrise), format = "%Y-%m-%d %H:%M:%S"),
+            sunset = as.POSIXct(paste(date, sunset_time), format = "%Y-%m-%d %H:%M:%S"),
+            dawn = as.POSIXct(paste(date, nautical_dawn_time), format = "%Y-%m-%d %H:%M:%S"),
+            dusk = as.POSIXct(paste(date, nautical_dusk), format = "%Y-%m-%d %H:%M:%S"),
+      ) |> 
+      mutate(
+            diel = case_when(
+                  datetime_est >= dawn & datetime_est < sunrise~ "dawn",
+                  datetime_est >= sunrise & datetime_est < sunset ~ "day",
+                  datetime_est >= sunset & datetime_est < dusk ~ "dusk",
+                  datetime_est >= dusk | datetime_est < dawn ~ "night",
+                  TRUE ~ NA_character_
+            )
+      ) |> 
+      mutate(diel = factor(diel, levels = c("dawn", "day", "dusk", "night")),
+             time1 = time)
 
 ### save data for future use
 write_rds(all1, 'data/binned-accelerometer-model-data-012025.RDS')
