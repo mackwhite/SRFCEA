@@ -100,7 +100,7 @@ temp_visfit |>
       ggplot(aes(temp, fit))+
       geom_ribbon(aes(ymin = fit_lower, ymax = fit_upper), fill = "grey60", alpha = 0.3)+
       geom_line(linewidth = 2, color= "black") + theme_bw()+
-      labs(x = "Water Temperature (°C)", y = expression(bold("SD Acceleration (m/s"^2*")"))) +
+      labs(x = "Water Temperature (°C)", y = expression(bold("Snook SD Acceleration (m/s"^2*")"))) +
       scale_x_continuous(breaks = c(16, 19, 22, 25, 28, 31, 34)) +
       scale_y_continuous(breaks = c(5,6,7,8,9,10,11)) +
       geom_vline(xintercept = 28.320, linetype = "dashed", color = "black", size = 1) +
@@ -192,7 +192,7 @@ temp_visfit |>
       ggplot(aes(temp, fit))+
       geom_ribbon(aes(ymin = fit_lower, ymax = fit_upper), fill = "grey60", alpha = 0.3)+
       geom_line(linewidth = 2, color= "black") + theme_bw()+
-      labs(x = "Water Temperature (°C)", y = expression(bold("SD Acceleration (m/s"^2*")"))) +
+      labs(x = "Water Temperature (°C)", y = expression(bold("Bass SD Acceleration (m/s"^2*")"))) +
       scale_x_continuous(breaks = c(16, 19, 22, 25, 28, 31, 34)) +
       scale_y_continuous(breaks = c(6,8,10,12,14,16,18,20)) +
       geom_vline(xintercept = 22.443, linetype = "dashed", color = "black", size = 1) +
