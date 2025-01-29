@@ -222,3 +222,69 @@ temp_visfit |>
             panel.grid.minor = element_blank(),
             panel.border = element_blank(),
             panel.background = element_blank())
+
+spp_palette = c("largemouth bass"="#708238",
+                "common snook"="#4682B4")
+
+test <- acc_bin |> group_by(species, time) |> 
+      summarize(acc = mean(mean_acceleration))
+
+acc_bin |> 
+      group_by(species, month, id, time) |> 
+      summarize(acc = mean(mean_acceleration, na.rm = TRUE)) |> 
+      ungroup() |> 
+      mutate(time = as.numeric(as.factor(time))) |> 
+      filter(acc <= 60) |> 
+      ggplot(aes(x = time, y = acc, color = species)) +
+      geom_point() +
+      geom_smooth(aes(method = "gam", color = species)) +
+      facet_wrap(~month) + 
+      # geom_vline(xintercept = c(9,19), linetype = "dashed", color = "black", size = 1) +
+      labs(x = "Time of Day", y = expression(bold("Mean Acceleration (m/s"^2*")"))) +
+      scale_x_continuous(breaks = c(04,8,12,16,20,24)) +
+      scale_y_continuous(breaks = c(10,20,30,40,50,60)) +
+      scale_color_manual(values = spp_palette) +
+      theme(axis.text = element_text(size = 14, face = "bold", colour = "black"),
+            axis.title = element_text(size = 16, face = "bold", colour = "black"),
+            plot.title = element_text(size = 16, face = "bold", colour = "black"),
+            panel.grid.major = element_blank(),
+            axis.line = element_line(colour = "black"),
+            panel.grid.minor = element_blank(),
+            panel.border = element_blank(),
+            panel.background = element_blank())
+
+ggsave('figs/monthly-diel-activity.png',
+       dpi = 800,
+       units= 'in',
+       height = 6,
+       width = 6.5)
+
+acc_bin |> 
+      group_by(species, id, time) |> 
+      summarize(acc = mean(mean_acceleration, na.rm = TRUE)) |> 
+      ungroup() |> 
+      mutate(time = as.numeric(as.factor(time))) |> 
+      filter(acc <= 60) |> 
+      ggplot(aes(x = time, y = acc, color = species)) +
+      geom_point() +
+      geom_smooth(method = "gam", color = "black") +
+      facet_wrap(~species) + 
+      # geom_vline(xintercept = c(9,19), linetype = "dashed", color = "black", size = 1) +
+      labs(x = "Time of Day", y = expression(bold("Mean Acceleration (m/s"^2*")"))) +
+      scale_x_continuous(breaks = c(04,8,12,16,20,24)) +
+      scale_y_continuous(breaks = c(10,20,30,40,50,60)) +
+      scale_color_manual(values = spp_palette) +
+      theme(axis.text = element_text(size = 14, face = "bold", colour = "black"),
+            axis.title = element_text(size = 16, face = "bold", colour = "black"),
+            plot.title = element_text(size = 16, face = "bold", colour = "black"),
+            panel.grid.major = element_blank(),
+            axis.line = element_line(colour = "black"),
+            panel.grid.minor = element_blank(),
+            panel.border = element_blank(),
+            panel.background = element_blank())
+
+ggsave('figs/diel-activity.png',
+       dpi = 800,
+       units= 'in',
+       height = 6,
+       width = 6.5)
