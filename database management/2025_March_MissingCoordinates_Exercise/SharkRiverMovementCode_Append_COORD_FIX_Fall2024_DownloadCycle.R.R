@@ -245,3 +245,9 @@ unique(final1$species)
 
 test1 <- test |> 
       filter(is.na(Latitude))
+
+test <- readRDS("database management/2025_March_MissingCoordinates_Exercise/RDS_files/FinalVUE_wDatetime_RehageSpecies_03052025_All.rds")
+filter <- test |> filter(transmitter == "A69-1303-58413")
+glimpse(test)
+
+write_csv(test, 'data/oos/snook_1303_58413_sharkriver_05072025.csv')
