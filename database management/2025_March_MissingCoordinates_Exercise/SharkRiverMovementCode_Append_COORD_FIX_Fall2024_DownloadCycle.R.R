@@ -136,7 +136,7 @@ rm(list = setdiff(ls(), keep))
 saveRDS(final_with_coords, "database management/2025_March_MissingCoordinates_Exercise/RDS_files/FinalVUE_wDatetime_03052025_ALL.rds") # fixing missing coordinates where possible
 final_with_coords <- read_rds("database management/2025_March_MissingCoordinates_Exercise/FinalVUE_wDatetime_03052025_ALL.rds")
 # read in tag list and station data ---------------------------------------
-TagList <- read_csv("database management/core_data/Acoustic Tags Master List_06132023update.csv") |> 
+TagList <- read_csv("database management/core_data/Acoustic Tags Master List_04222025_update.csv") |> 
       mutate(Transmitter = as.factor(Transmitter))
 # StationData <- read_csv("database management/core_data/Station_Distance_Updated07142020.csv") |> 
 #       mutate(Station.Name = as.factor(VUE_Name))

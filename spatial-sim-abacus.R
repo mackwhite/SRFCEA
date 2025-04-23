@@ -19,6 +19,18 @@ df <- tracks |>
       filter(date >= "2010-07-08" & date <= "2023-07-08")
 glimpse(df)
 
+group <- df |> 
+      distinct(id, date) |> 
+      count(id, name = "n_days_detected") |> 
+      summarise(
+            mean_days = mean(n_days_detected),
+            sd_days = sd(n_days_detected),
+            n = n(),
+            se = sd_days / sqrt(n),
+            lower_95 = mean_days - 1.96 * se,
+            upper_95 = mean_days + 1.96 * se
+      )
+
 p <- ggplot(df, aes(x = date, y = id, color = distance)) +
       geom_point(size = 0.5, alpha = 0.7) +
       scale_color_viridis_c(name = "Distance\nto Gulf of\nMX", option = "C") +
@@ -34,7 +46,7 @@ p <- ggplot(df, aes(x = date, y = id, color = distance)) +
            subtitle = "Since 2012 | n = 227")
 
 ggsave('figs/spatsim-abacus.pdf', plot = p, 
-       units= 'in', height = 8, width = 8)
+       units= 'in', height = 12, width = 10)
 
 ggsave('figs/spatsim-abacus.png', plot = p, dpi = 600, 
        units= 'in', height = 8, width = 4)
