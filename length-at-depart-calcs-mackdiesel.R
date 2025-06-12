@@ -61,20 +61,32 @@ df_dttm <- df1 |>
              max_det = as.POSIXct(max_det, format = "%m/%d/%Y %H:%M"),
              DateTagged = as.POSIXct(DateTagged, format = "%m/%d/%Y %H:%M")) |> 
       ### SL_cm to fl_mm conversion (Y = a + b*X)
-      mutate(sl_mm = SL_cm*10,
-             fl_mm = 20.0876 + 1.0630 * sl_mm)
+      mutate(sl_mm_tagging = SL_cm*10,
+             fl_mm_tagging = 20.0876 + 1.0630 * sl_mm_tagging)
 glimpse(df_dttm)
 
+
 gas <- df_dttm |> 
-      mutate(age = t0 - (1 / K) * log(1 - fl_mm / L_asymp))|> 
+      mutate(age = t0 - (1 / K) * log(1 - fl_mm_tagging / L_asymp))|> 
       mutate(age_days = age*365.25,
              id = row_number()) |> 
       mutate(time_diff_years = as.numeric(difftime(dept, min_det, units = "days")) / 365.25,
              length_at_dept_fl_mm = L_asymp * (1 - exp(-K * (time_diff_years + age - t0)))) |> 
       mutate(length_at_dept_sl_mm = -14.7684 + 0.9338 * length_at_dept_fl_mm,
              length_at_dept_sl_cm = length_at_dept_sl_mm/10) |> 
-      select(-sl_mm, -fl_mm, -age_days, -id, -length_at_dept_sl_mm, -length_at_dept_fl_mm) |> 
-      separate(transmitter, into = c("code1", "code2", "id"), sep = "-", remove = FALSE) |> 
-      select(-code1, -code2)
+      mutate(diff_FL = length_at_dept_fl_mm - fl_mm_tagging,
+             diff_SL = length_at_dept_sl_mm - sl_mm_tagging) |> 
+      mutate(length_at_dept_sl_mm_fix = case_when(
+            diff_SL <0 ~ sl_mm_tagging,
+            TRUE ~ length_at_dept_sl_mm
+      )) |> 
+      mutate(length_at_dept_sl_cm = length_at_dept_sl_mm_fix/10)
+
+test <- gas |> 
+      mutate(diff_FL = length_at_dept_fl_mm - fl_mm_tagging,
+                      diff_SL = length_at_dept_sl_mm - sl_mm_tagging,
+             diff_SL2 = length_at_dept_sl_mm_fix - sl_mm_tagging) |> 
+      filter(diff_SL < 0) |> 
+      select(transmitter, time_diff_years, diff_FL, diff_SL)
       
-write_csv(gas, "data/thatgassy_gas_jan22_2025.csv")
+write_csv(gas, "data/thatgassy_gas_june08_2025.csv")
