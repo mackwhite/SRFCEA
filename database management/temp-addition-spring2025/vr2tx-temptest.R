@@ -41,7 +41,7 @@ glimpse(temp1)
 snook <- read_rds('database management/2025_Spring/RDS_files/AllSnook_POR_0612025.rds')
 glimpse(snook)
 snooktest <- snook |> filter(Receiver == "VR2Tx-484375")
-rm(RehageVUE_Distance, fall2024, spring2025, temp)
+# rm(snook, fall2024, spring2025, temp)
 
 snooktemp <- temp1 |> left_join(snook)
 test <- snooktemp |> filter(Receiver == "VR2Tx-484384")
