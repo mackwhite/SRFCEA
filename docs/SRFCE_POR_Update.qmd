@@ -1,0 +1,223 @@
+---
+title: "Period of Record Update Example for SRFCEA"
+author: "Mack White"
+format: html
+editor: source
+date: 2025-06-12
+execute: 
+  echo: true
+  warning: false
+  message: true
+---
+
+## Script Information
+
+Here, you will find the code used to update the SRFCEA Period-of-Record Dataset. I just took the last script I used to update the POR. If something seems off, feel free to shoot me (Mack White) a text at (304) 482-9142 or contact Jennifer Rehage - she can put you in contact with me if you are reading this in like 2040 or something
+
+## Housekeeping
+
+#### load necessary libraries
+
+*The librarian package in awesome - if you don't have it, download it and use it ;)*
+
+```{r}
+# install.packages("librarian")
+librarian::shelf(tidyverse, scales)
+```
+
+#### define custom functions
+
+```{r}
+### function to save rds files a little quicker than normal
+save_rds <- function(data, filename) {
+      saveRDS(data, file = filename)
+      return(data)
+}
+
+### function to check for NAs in dataset
+nacheck <- function(df) {
+      na_count_per_column <- sapply(df, function(x) sum(is.na(x)))
+      print(na_count_per_column)
+}
+```
+
+#### read in necessary data
+
+##### metadata
+
+*Do not forget to update tag list every so often and hopefully never again update station list ;)*
+
+```{r}
+#| warning: false
+#| results: hide
+
+### tagged animal information
+TagList <- read_csv('../database management/core_data/archive/Acoustic Tags Master List_04222025_update.csv') |> 
+      mutate(Transmitter = as.factor(Transmitter))
+glimpse(TagList)
+
+### listening station information 
+StationData <- read_csv("../database management/core_data/archive/Station_Distance_Updated03052025.csv") |> 
+      mutate(Station.Name = as.factor(VUE_Name))
+glimpse(StationData)
+```
+
+##### new data
+
+*This will be the VUE offload file created from all new downloads*
+
+```{r}
+#| warning: false
+#| results: hide
+
+NewestVUE <- read_csv("../database management/2025_Spring/Spring2025_VUEoffload.csv")
+glimpse(NewestVUE)
+```
+
+Manipulate data for joins with previous master vue file
+
+```{r}
+#| warning: false
+#| results: hide
+
+NewestVUE1 <- NewestVUE |> 
+      select(-`Transmitter Type`, -`Sensor Precision`) |> 
+      mutate(across(c(Receiver, Transmitter, `Transmitter Name`, 
+                      `Sensor Unit`, `Station Name`), factor),
+             Datetime_UTC = as.POSIXct(`Date and Time (UTC)`,
+                                       format = "%Y-%m-%d %H:%M:%S")) |> 
+      select(-`Date and Time (UTC)`) |> 
+      rename(
+            Transmitter.Name = `Transmitter Name`,
+            Transmitter.Serial = `Transmitter Serial`,
+            Sensor.Value = `Sensor Value`,
+            Sensor.Unit = `Sensor Unit`,
+            Station.Name = `Station Name`
+      ) |> 
+      select(Datetime_UTC, everything()) |> 
+      mutate(Transmitter.Serial = as.integer(Transmitter.Serial)) |> 
+      select(-Latitude, -Longitude)
+glimpse(NewestVUE1)
+```
+
+##### old data
+
+*This will be the most recent 'FinalVUE_wDatetime_MMDDYYYY_ALL.rds' file*
+
+```{r}
+#| warning: false
+#| results: hide
+
+OldVUE <- readRDS("../database management/2025_March_MissingCoordinates_Exercise/RDS_files/FinalVUE_wDatetime_03052025_ALL.rds")
+glimpse(OldVUE)
+OldVUE1 <- OldVUE |> select(-Station, -Distance, -Latitude, -Longitude)
+```
+
+## Update Period of Record
+
+#### join new and old data files together
+
+*clean it up a little*
+
+```{r}
+#| warning: false
+#| results: hide
+
+AllVUE <- rbind(OldVUE1, NewestVUE1)
+
+### quick env clean up
+rm(OldVUE1, NewestVUE1)
+glimpse(AllVUE)
+
+### old school datetime format, how JM had it :)
+AllVUE$Datetime_UTC <- as.POSIXct(AllVUE$Datetime_UTC, 
+                                  format="%Y-%m-%d %H:%M:%S", tz = "UTC")
+glimpse(AllVUE)
+
+### join with station data information 
+AllVUEwCoords <- AllVUE |> left_join(StationData)
+
+### check out NAs - it hurts, but do it
+nacheck(AllVUEwCoords)
+rm(AllVUE)
+```
+
+there is going to be a ton of NAs - do not worry, this is just the nature of the early years of the array - if you are still concerned, double check max date of missing information (predates our efforts to clean up dataset)... what is most important is that **datetime**, **transmitter**, and **station.name** have no NAs
+
+```{r}
+test <- AllVUEwCoords |> filter(is.na(VUE_Name))
+unique(test$Station.Name)
+max(test$Datetime_UTC)
+```
+
+#### save the updated file with coordinate information
+
+*this file will become the next 'FinalVUE_wDatetime_MMDDYYYY_ALL.rds' for appending new data*
+
+```{r}
+#| warning: false
+#| results: hide
+
+### save it out 
+saveRDS(AllVUEwCoords, "../database management/2025_Spring/RDS_files/FinalVUE_wDatetime_05122025_ALL.rds")
+
+### read it back in and make sure it loads properly, looks good, etc.
+AllVUEwCoords <- readRDS("database management/2025_Spring/RDS_files/FinalVUE_wDatetime_05122025_ALL.rds")
+```
+
+#### Bring all of the disparate datasets together
+
+```{r}
+#| warning: false
+#| results: hide
+
+RehageVUE_Distance <- AllVUEwCoords |> 
+      left_join(TagList, by = "Transmitter") 
+
+### clean up env
+rm(AllVUEwCoords, TagList)
+```
+
+#### take care of the ol' snook-bass, crazy looking thing...
+
+*seriously though, this is the result of deploying a tag following the harvest and return of tag from initially tagged animal*
+
+```{r}
+#| warning: false
+#| results: hide
+
+RehageVUE_Distance <- RehageVUE_Distance |> 
+      ### freakin snook-bass
+      mutate(Species = case_when(
+            Transmitter == "A69-1303-51312" & Datetime_UTC >= "2014-03-01 00:00:00" ~ "Bass",
+            Transmitter == "A69-1303-51312" & Datetime_UTC < "2014-03-01 00:00:00" ~ "Snook",
+            TRUE ~ Species
+      )) |> 
+      distinct()
+
+### clean environment ---
+keep <- c("RehageVUE_Distance", "save_rds")
+rm(list = setdiff(ls(), keep))
+```
+
+## Read out all of the clean POR files for individual species
+
+**can be joined together later if interested in evaluating interactions or something**
+
+```{r}
+RehageVUE_Distance |> 
+      filter(Species == "Snook") |> 
+      save_rds("../database management/2025_Spring/RDS_files/AllSnook_POR_0612025.rds")
+
+RehageVUE_Distance |> 
+      filter(Species == "Bass") |> 
+      save_rds("../database management/2025_Spring/RDS_files/AllBass_POR_0612025.rds")
+
+RehageVUE_Distance |> 
+      filter(Species == "Redfish") |> 
+      save_rds("../database management/2025_Spring/RDS_files/AllRedfish_POR_0612025.rds")
+
+RehageVUE_Distance |> 
+      filter(Species == "Tarpon") |> 
+      save_rds("../database management/2025_Spring/RDS_files/AllTarpon_POR_0612025.rds")
+```
